@@ -1,13 +1,15 @@
 package com.royzeng.pilgrim;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import com.royzeng.pilgrim.view.MainRootView;
+
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(new MainRootView(this));
     }
 }
