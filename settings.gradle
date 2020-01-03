@@ -1,2 +1,2 @@
-include ':app', ':utils'
+include ':app'
 rootProject.name='pilgrim'
