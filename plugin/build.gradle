@@ -1,0 +1,19 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies{
+    compile gradleApi()//gradle sdk
+    compile localGroovy()//groovy sdk
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+uploadArchives {
+    repositories{
+        mavenDeployer {
+            repository(url: uri(LOCAL_REPO_URL))
+            pom.groupId = PROJ_GROUP
+            pom.artifactId = PROJ_ARTIFACTID
+            pom.version = PROJ_VERSION
+        }
+    }
+}
