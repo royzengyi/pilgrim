@@ -2,9 +2,14 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 
 dependencies{
-    compile gradleApi()//gradle sdk
-    compile localGroovy()//groovy sdk
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation gradleApi()//gradle sdk
+    implementation localGroovy()//groovy sdk
+    implementation 'com.android.tools.build:gradle-api:3.0.1'
+    implementation 'com.android.tools.build:gradle:3.0.1'
+    implementation 'org.ow2.asm:asm:7.2'
+    implementation 'org.ow2.asm:asm-util:7.2'
+    implementation 'org.ow2.asm:asm-commons:7.2'
+
 }
 
 uploadArchives {
