@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.royzeng.plugin'
+apply plugin: 'com.royzeng.timecostlog'
 
 android {
     compileSdkVersion 29
@@ -19,6 +19,11 @@ android {
     }
 }
 
+timeCostLogPkgNames {
+    pkgList = ['com.royzeng.pilgrim']
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.royzeng.libs:timecostlog:1.0.0'
 }
