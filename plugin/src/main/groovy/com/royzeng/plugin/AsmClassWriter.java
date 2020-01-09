@@ -154,13 +154,13 @@ public class AsmClassWriter extends ClassWriter implements Opcodes {
             inputStream = mClassLoader.getResourceAsStream(className + ".class");
             return new ClassReader(inputStream);
         } catch (IOException ignored) {
-            System.out.println("-- getClassReader IOException:" + ignored.getMessage());
+            ignored.printStackTrace();
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException ignored) {
-                    System.out.println("-- getClassReader IOException");
+                    ignored.printStackTrace();
                 }
             }
         }

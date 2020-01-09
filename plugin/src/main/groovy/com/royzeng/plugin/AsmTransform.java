@@ -38,7 +38,7 @@ class AsmTransform extends Transform {
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation);
 
-        pkgConfig =  (PacakageConfig)mProject.getExtensions().getByName(Setting.PACAKAGE_CONFIG);
+        pkgConfig = (PacakageConfig) mProject.getExtensions().getByName(Setting.PACAKAGE_CONFIG);
 
         Collection<TransformInput> inputs = transformInvocation.getInputs();
         TransformOutputProvider outputProvider = transformInvocation.getOutputProvider();
@@ -89,7 +89,6 @@ class AsmTransform extends Transform {
         try {
             FileUtils.copyFile(input, dest);
         } catch (IOException e) {
-            System.out.println("transformJar IOException");
             e.printStackTrace();
         }
     }
@@ -100,8 +99,8 @@ class AsmTransform extends Transform {
         final String outputDirPath = outputDir.getAbsolutePath();
         if (inputDir.isDirectory()) {
             for (final File file : com.android.utils.FileUtils.getAllFiles(inputDir)) {
-                    String filePath = file.getAbsolutePath();
-                    File outputFile = new File(filePath.replace(inputDirPath, outputDirPath));
+                String filePath = file.getAbsolutePath();
+                File outputFile = new File(filePath.replace(inputDirPath, outputDirPath));
                 transformSingleFile(file, outputFile);
             }
         }
@@ -117,9 +116,9 @@ class AsmTransform extends Transform {
                 FileUtils.touch(dest);
                 FileInputStream is = new FileInputStream(inputPath);
                 ClassReader cr = new ClassReader(is);
-                ClassWriter cw = new AsmClassWriter(mClassLoader, ClassWriter.COMPUTE_FRAMES);
+                ClassWriter cw = new AsmClassWriter(mClassLoader, ClassWriter.COMPUTE_MAXS);
                 MethodClassAdapter adapter = new MethodClassAdapter(cw);
-                cr.accept(adapter,  ClassReader.EXPAND_FRAMES);
+                cr.accept(adapter, ClassReader.EXPAND_FRAMES);
                 FileOutputStream fos = new FileOutputStream(outputPath);
                 fos.write(cw.toByteArray());
                 fos.close();
@@ -137,9 +136,9 @@ class AsmTransform extends Transform {
     }
 
     private boolean needInject(String filePath) {
-        if(pkgConfig != null && !pkgConfig.pkgList.isEmpty()) {
-            for(String item : pkgConfig.pkgList) {
-                if(filePath.contains(item.replace('.', '\\'))) {
+        if (pkgConfig != null && !pkgConfig.pkgList.isEmpty()) {
+            for (String item : pkgConfig.pkgList) {
+                if (filePath.contains(item.replace('.', '\\'))) {
                     return true;
                 }
             }
