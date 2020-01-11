@@ -1,2 +1,2 @@
-include ':app', ':plugin', ':timecostlogger'
+include ':app', ':timecostplugin', ':timecostapi'
 rootProject.name='pilgrim'

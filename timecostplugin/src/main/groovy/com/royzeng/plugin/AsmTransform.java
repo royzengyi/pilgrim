@@ -10,6 +10,7 @@ import com.android.build.api.transform.TransformInput;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
+import com.google.common.collect.FluentIterable;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -34,9 +35,14 @@ class AsmTransform extends Transform {
         mProject = project;
     }
 
+    int copyNum;
+    int transformNum;
+
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation);
+
+        long startTime = System.currentTimeMillis();
 
         pkgConfig = (PacakageConfig) mProject.getExtensions().getByName(Setting.PACAKAGE_CONFIG);
 
@@ -62,6 +68,8 @@ class AsmTransform extends Transform {
                 transformDir(directoryInput.getFile(), dest);
             }
         }
+
+        System.out.println("======transform cost time:" + (System.currentTimeMillis() - startTime) + " copyNum:" + copyNum + " transformNum:" + transformNum);
     }
 
     @Override
@@ -98,7 +106,8 @@ class AsmTransform extends Transform {
         final String inputDirPath = inputDir.getAbsolutePath();
         final String outputDirPath = outputDir.getAbsolutePath();
         if (inputDir.isDirectory()) {
-            for (final File file : com.android.utils.FileUtils.getAllFiles(inputDir)) {
+            FluentIterable<File> files = com.android.utils.FileUtils.getAllFiles(inputDir);
+            for (final File file : files) {
                 String filePath = file.getAbsolutePath();
                 File outputFile = new File(filePath.replace(inputDirPath, outputDirPath));
                 transformSingleFile(file, outputFile);
@@ -111,7 +120,7 @@ class AsmTransform extends Transform {
         String outputPath = dest.getAbsolutePath();
 
         if (needInject(inputPath)) {
-            System.out.println("transformSingleFile input:" + inputPath);
+            System.out.println("transformSingleFile:" + inputPath);
             try {
                 FileUtils.touch(dest);
                 FileInputStream is = new FileInputStream(inputPath);
@@ -122,13 +131,14 @@ class AsmTransform extends Transform {
                 FileOutputStream fos = new FileOutputStream(outputPath);
                 fos.write(cw.toByteArray());
                 fos.close();
+                transformNum++;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("copySingleFile input:" + inputPath);
             try {
                 FileUtils.copyFile(input, dest);
+                copyNum++;
             } catch (IOException e) {
                 e.printStackTrace();
             }
