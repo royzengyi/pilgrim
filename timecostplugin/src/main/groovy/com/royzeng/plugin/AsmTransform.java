@@ -4,6 +4,7 @@ import com.android.build.api.transform.DirectoryInput;
 import com.android.build.api.transform.Format;
 import com.android.build.api.transform.JarInput;
 import com.android.build.api.transform.QualifiedContent;
+import com.android.build.api.transform.Status;
 import com.android.build.api.transform.Transform;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInput;
@@ -11,6 +12,7 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.google.common.collect.FluentIterable;
+import com.google.common.io.Files;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -23,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 class AsmTransform extends Transform {
@@ -46,9 +49,17 @@ class AsmTransform extends Transform {
 
         pkgConfig = (PacakageConfig) mProject.getExtensions().getByName(Setting.PACAKAGE_CONFIG);
 
+        boolean isIncremental = transformInvocation.isIncremental();
+
+        System.out.println("==asm transform=== isIncremental:" + isIncremental);
+
         Collection<TransformInput> inputs = transformInvocation.getInputs();
         TransformOutputProvider outputProvider = transformInvocation.getOutputProvider();
-        outputProvider.deleteAll();
+
+        if (!isIncremental) {
+            outputProvider.deleteAll();
+        }
+
 
         mClassLoader = ClassLoaderHelper.getClassLoader(inputs, transformInvocation.getReferencedInputs(), mProject);
 
@@ -59,17 +70,73 @@ class AsmTransform extends Transform {
                         jarInput.getContentTypes(),
                         jarInput.getScopes(),
                         Format.JAR);
-                transformJar(jarInput.getFile(), dest);
+                handlerJar(jarInput, isIncremental, dest);
             }
             for (DirectoryInput directoryInput : input.getDirectoryInputs()) {
                 File dest = outputProvider.getContentLocation(directoryInput.getName(),
                         directoryInput.getContentTypes(), directoryInput.getScopes(),
                         Format.DIRECTORY);
-                transformDir(directoryInput.getFile(), dest);
+                handlerDir(directoryInput, isIncremental, dest);
             }
         }
 
-        System.out.println("======transform cost time:" + (System.currentTimeMillis() - startTime) + " copyNum:" + copyNum + " transformNum:" + transformNum);
+        System.out.println("==asm transform=== cost time:" + (System.currentTimeMillis() - startTime) + " copyNum:" + copyNum + " transformNum:" + transformNum);
+    }
+
+    private void handlerJar(JarInput jarInput, boolean isIncremental, File dest) throws IOException {
+        if (isIncremental) {
+            Status status = jarInput.getStatus();
+            switch (status) {
+                case NOTCHANGED:
+                    break;
+                case ADDED:
+                case CHANGED:
+                    transformJar(jarInput.getFile(), dest);
+                    break;
+                case REMOVED:
+                    if (dest.exists()) {
+                        FileUtils.forceDelete(dest);
+                    }
+                    break;
+            }
+        } else {
+            transformJar(jarInput.getFile(), dest);
+        }
+    }
+
+    private void handlerDir(DirectoryInput directoryInput, boolean isIncremental, File dest) throws IOException {
+        if (isIncremental) {
+            FileUtils.forceMkdir(dest);
+            String srcDirPath = directoryInput.getFile().getAbsolutePath();
+            String destDirPath = dest.getAbsolutePath();
+            Map<File, Status> fileStatusMap = directoryInput.getChangedFiles();
+            for (Map.Entry<File, Status> changeFile : fileStatusMap.entrySet()) {
+                Status status = changeFile.getValue();
+                File inputFile = changeFile.getKey();
+                String destFilePath = inputFile.getAbsolutePath().replace(srcDirPath, destDirPath);
+                File destFile = new File(destFilePath);
+                switch (status) {
+                    case NOTCHANGED:
+                        break;
+                    case REMOVED:
+                        if (destFile.exists()) {
+                            destFile.delete();
+                        }
+                        break;
+                    case ADDED:
+                    case CHANGED:
+                        try {
+                            FileUtils.touch(destFile);
+                        } catch (IOException e) {
+                            Files.createParentDirs(destFile);
+                        }
+                        transformSingleFile(inputFile, destFile);
+                        break;
+                }
+            }
+        } else {
+            transformDir(directoryInput.getFile(), dest);
+        }
     }
 
     @Override
@@ -148,7 +215,7 @@ class AsmTransform extends Transform {
     private boolean needInject(String filePath) {
         if (pkgConfig != null && !pkgConfig.pkgList.isEmpty()) {
             for (String item : pkgConfig.pkgList) {
-                if (filePath.contains(item.replace('.', '\\'))) {
+                if (filePath.contains(item.replace('.', '\\')) && !filePath.contains("_ViewBinding")) {
                     return true;
                 }
             }

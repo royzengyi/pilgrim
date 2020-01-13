@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
-apply plugin: 'com.novoda.bintray-release'
+//apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 29
@@ -26,15 +26,15 @@ android {
     }
 }
 
-publish {
-    userOrg = 'royzengyi'      //bintray注册的用户名
-    groupId = 'com.royzeng.libs'         //compile引用时的第1部分groupId
-    artifactId = 'timecost'     //compile引用时的第2部分项目名
-    publishVersion = '1.0.0'    //compile引用时的第3部分版本号
-    desc = 'This is time cost logger library '
-    website = 'https://github.com/royzengyi/pilgrim'
-    uploadName = 'timecostapi'
-}
+//publish {
+//    userOrg = 'royzengyi'      //bintray注册的用户名
+//    groupId = 'com.royzeng.libs'         //compile引用时的第1部分groupId
+//    artifactId = 'timecost'     //compile引用时的第2部分项目名
+//    publishVersion = '1.0.1'    //compile引用时的第3部分版本号
+//    desc = 'This is time cost logger library '
+//    website = 'https://github.com/royzengyi/pilgrim'
+//    uploadName = 'timecostapi'
+//}
 
 allprojects {
     repositories {
@@ -54,13 +54,13 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
 }
 
-uploadArchives {
-    repositories{
-        mavenDeployer {
-            repository(url: uri(LOCAL_REPO_URL))
-            pom.groupId = PROJ_GROUP
-            pom.artifactId = PROJ_ARTIFACTID
-            pom.version = PROJ_VERSION
-        }
-    }
-}
+//uploadArchives {
+//    repositories{
+//        mavenDeployer {
+//            repository(url: uri(LOCAL_REPO_URL))
+//            pom.groupId = PROJ_GROUP
+//            pom.artifactId = PROJ_ARTIFACTID
+//            pom.version = PROJ_VERSION
+//        }
+//    }
+//}

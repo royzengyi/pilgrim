@@ -12,7 +12,6 @@ public class TimeCostManager {
 
     //call in plugin
     public static void logTimeCost(String method, long time) {
-        System.out.println("=======logTimeCost=========");
         if (isMainThread() && mlogger != null) {
             mlogger.logger(method, time);
         }

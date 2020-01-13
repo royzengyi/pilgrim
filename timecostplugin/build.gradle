@@ -1,6 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
-//apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.novoda.bintray-release'
 
 dependencies{
     implementation gradleApi()//gradle sdk
@@ -14,15 +14,15 @@ dependencies{
 
 }
 
-//publish {
-//    userOrg = 'royzengyi'      //bintray注册的用户名
-//    groupId = 'com.royzeng.plugin'         //compile引用时的第1部分groupId
-//    artifactId = 'timecost'     //compile引用时的第2部分项目名
-//    publishVersion = '1.0.0'    //compile引用时的第3部分版本号
-//    desc = 'This is time cost logger plugin for gradle build '
-//    website = 'https://github.com/royzengyi/pilgrim'
-//    uploadName = 'timecostplugin'
-//}
+publish {
+    userOrg = 'royzengyi'      //bintray注册的用户名
+    groupId = 'com.royzeng.plugin'         //compile引用时的第1部分groupId
+    artifactId = 'timecost'     //compile引用时的第2部分项目名
+    publishVersion = '1.0.2'    //compile引用时的第3部分版本号
+    desc = 'This is time cost logger plugin for gradle build '
+    website = 'https://github.com/royzengyi/pilgrim'
+    uploadName = 'timecostplugin'
+}
 
 uploadArchives {
     repositories{

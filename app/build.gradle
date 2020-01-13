@@ -25,5 +25,5 @@ timeCostLogPkgNames {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.royzeng.libs:timecostlog:1.0.0'
+    implementation 'com.royzeng.libs:timecost:1.0.1'
 }
